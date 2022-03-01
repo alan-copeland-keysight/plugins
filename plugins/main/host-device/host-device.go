@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -105,7 +106,7 @@ func cmdAdd(args *skel.CmdArgs) error {
 
 	result := &current.Result{}
 	var contDev netlink.Link
-	fmt.Printf("%t - Checking to see if DPDKMode\n", cfg.DPDKMode)
+	log.Printf("%t - Checking to see if DPDKMode\n", cfg.DPDKMode)
 	if !cfg.DPDKMode {
 		hostDev, err := getLink(cfg.Device, cfg.HWAddr, cfg.KernelPath, cfg.PCIAddr)
 		if err != nil {
@@ -290,34 +291,34 @@ func moveLinkOut(containerNs ns.NetNS, ifName string) error {
 }
 
 func hasDpdkDriver(pciaddr string) (bool, error) {
-	fmt.Printf("Top of hasDpdkDriver\n")
+	log.Printf("Top of hasDpdkDriver\n")
 
 	driverLink := filepath.Join(sysBusPCI, pciaddr, "driver")
-	fmt.Printf("%s - driverLink\n", driverLink)
+	log.Printf("%s - driverLink\n", driverLink)
 
 	driverPath, err := filepath.EvalSymlinks(driverLink)
 	if err != nil {
-		fmt.Printf("EvalSymlinks is false\n")
+		log.Printf("EvalSymlinks is false\n")
 		return false, err
 	}
-	fmt.Printf("os.Stat(drivePath)\n")
+	log.Printf("os.Stat(drivePath)\n")
 	driverStat, err := os.Stat(driverPath)
 	if err != nil {
-		fmt.Printf("os.Stat is false\n")
+		log.Printf("os.Stat is false\n")
 		return false, err
 	}
 
-	fmt.Printf("checking driverName\n")
+	log.Printf("checking driverName\n")
 	driverName := driverStat.Name()
-	fmt.Printf("Driver name is: %s\n")
+	log.Printf("Driver name is: %s\n")
 	for _, drv := range userspaceDrivers {
-		fmt.Printf("%s - drv\n", drv)
+		log.Printf("%s - drv\n", drv)
 		if driverName == drv {
-			fmt.Printf("driver name match \n")
+			log.Printf("driver name match \n")
 			return true, nil
 		}
 	}
-	fmt.Printf("driver name match failed\n")
+	log.Printf("driver name match failed\n")
 
 	return false, nil
 }
